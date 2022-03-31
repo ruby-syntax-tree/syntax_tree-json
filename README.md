@@ -36,14 +36,14 @@ From the CLI:
 
 ```sh
 $ stree ast --plugins=json file.json
-(root children=[(tag name="span" value="Hello, world!")])
+(root object=(object values={"Hello"=>(literal value="world!")}))
 ```
 
 or
 
 ```sh
 $ stree format --plugins=json file.json
-%span Hello, world!
+{ "Hello": "world!" }
 ```
 
 or
