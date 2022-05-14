@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    syntax_tree-json (0.1.0)
+    syntax_tree-json (0.2.0)
       json
       prettier_print
       syntax_tree (>= 2.0.1)
