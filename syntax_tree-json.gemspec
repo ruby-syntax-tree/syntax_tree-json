@@ -24,6 +24,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = %w[lib]
 
   spec.add_dependency "json"
+  spec.add_dependency "prettier_print"
   spec.add_dependency "syntax_tree", ">= 2.0.1"
 
   spec.add_development_dependency "bundler"
