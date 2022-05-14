@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "json"
+require "prettier_print"
 require "syntax_tree"
 
 require_relative "json/version"
@@ -97,8 +98,8 @@ module SyntaxTree
     end
 
     class << self
-      def format(source)
-        formatter = PP.new([])
+      def format(source, maxwidth = 80)
+        formatter = PrettierPrint.new([], maxwidth)
         parse(source).format(formatter)
 
         formatter.flush
