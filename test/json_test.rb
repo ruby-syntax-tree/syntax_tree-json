@@ -2,6 +2,9 @@
 
 require "test_helper"
 
+# Here to make sure the thread-local variable gets set up correctly for 2.7.
+PP.pp(nil, +"")
+
 class JSONTest < Minitest::Test
   def test_objects
     assert_format(<<~JSON)
@@ -49,6 +52,9 @@ class JSONTest < Minitest::Test
   private
 
   def assert_format(source)
-    assert_equal(SyntaxTree::JSON.format(source), source)
+    visitor = SyntaxTree::JSON::PrettyPrint.new(PP.new(+"", 80))
+    SyntaxTree::JSON.parse(source).accept(visitor)
+
+    assert_equal(source, SyntaxTree::JSON.format(source))
   end
 end
