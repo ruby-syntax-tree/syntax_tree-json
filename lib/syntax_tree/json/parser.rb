@@ -43,15 +43,16 @@ module SyntaxTree
         raise ParseError, "invalid UTF-8" unless buffer.valid_encoding?
 
         tokens = []
+        buffer.gsub!(/\A\s+/, "")
 
         until buffer.empty?
           tokens <<
-            case buffer.strip
+            case buffer
             in /\A[\{\}\[\],:]/
               Token.new(type: $&.to_sym)
-            in /\A-?(0|[1-9]\d*)(\.\d+)?([Ee][-+]?\d+)?/
+            in %r{\A-?(0|[1-9]\d*)(\.\d+)?([Ee][-+]?\d+)?}
               Token.new(type: :number, value: $&)
-            in /\A"[^"\\]*(?:\\.[^"\\]*)*"/
+            in %r{\A"[^"\\\t\n\x00]*(?:\\[bfnrtu\\/"][^"\\]*)*"}
               Token.new(type: :string, value: $&)
             in /\Atrue/
               Token.new(type: :true)
@@ -60,10 +61,10 @@ module SyntaxTree
             in /\Anull/
               Token.new(type: :null)
             else
-              raise ParseError, "unexpected token: #{buffer.strip[0]}"
+              raise ParseError, "unexpected token: #{buffer[0]}"
             end
 
-          buffer = $'
+          buffer = $'.gsub(/\A\s+/, "")
         end
 
         tokens

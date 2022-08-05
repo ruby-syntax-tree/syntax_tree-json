@@ -65,28 +65,15 @@ module SyntaxTree
     end
 
     KNOWN_N_FAILURES = %w[
-      test/JSONTestSuite/test_parsing/n_multidigit_number_then_00.json
       test/JSONTestSuite/test_parsing/n_string_1_surrogate_then_escape_u.json
       test/JSONTestSuite/test_parsing/n_string_1_surrogate_then_escape_u1.json
       test/JSONTestSuite/test_parsing/n_string_1_surrogate_then_escape_u1x.json
       test/JSONTestSuite/test_parsing/n_string_1_surrogate_then_escape.json
-      test/JSONTestSuite/test_parsing/n_string_backslash_00.json
-      test/JSONTestSuite/test_parsing/n_string_escape_x.json
-      test/JSONTestSuite/test_parsing/n_string_escaped_backslash_bad.json
-      test/JSONTestSuite/test_parsing/n_string_escaped_ctrl_char_tab.json
-      test/JSONTestSuite/test_parsing/n_string_escaped_emoji.json
-      test/JSONTestSuite/test_parsing/n_string_incomplete_escape.json
       test/JSONTestSuite/test_parsing/n_string_incomplete_escaped_character.json
       test/JSONTestSuite/test_parsing/n_string_incomplete_surrogate_escape_invalid.json
       test/JSONTestSuite/test_parsing/n_string_incomplete_surrogate.json
-      test/JSONTestSuite/test_parsing/n_string_invalid_backslash_esc.json
       test/JSONTestSuite/test_parsing/n_string_invalid_unicode_escape.json
-      test/JSONTestSuite/test_parsing/n_string_unescaped_ctrl_char.json
-      test/JSONTestSuite/test_parsing/n_string_unescaped_newline.json
-      test/JSONTestSuite/test_parsing/n_string_unescaped_tab.json
-      test/JSONTestSuite/test_parsing/n_string_unicode_CapitalU.json
       test/JSONTestSuite/test_parsing/n_structure_100000_opening_arrays.json
-      test/JSONTestSuite/test_parsing/n_structure_null-byte-outside-string.json
       test/JSONTestSuite/test_parsing/n_structure_open_array_object.json
       test/JSONTestSuite/test_parsing/n_structure_whitespace_formfeed.json
     ]
