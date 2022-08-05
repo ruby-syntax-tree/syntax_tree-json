@@ -10,10 +10,14 @@ jobs:
       CI: true
     steps:
     - uses: actions/checkout@master
+      with:
+          submodules: recursive
+
     - uses: ruby/setup-ruby@v1
       with:
         bundler-cache: true
         ruby-version: '3.1'
+
     - name: Test
       run: bundle exec rake test
   automerge:

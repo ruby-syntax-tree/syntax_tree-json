@@ -87,7 +87,7 @@ module SyntaxTree
           []
         end
 
-        alias deconstruct value
+        alias deconstruct child_nodes
 
         def deconstruct_keys(keys)
           { value: value }
@@ -110,7 +110,7 @@ module SyntaxTree
           values.values
         end
 
-        alias deconstruct values
+        alias deconstruct child_nodes
 
         def deconstruct_keys(keys)
           { values: values }
@@ -133,7 +133,7 @@ module SyntaxTree
           [value]
         end
 
-        alias deconstruct value
+        alias deconstruct child_nodes
 
         def deconstruct_keys(keys)
           { value: value }
@@ -156,7 +156,7 @@ module SyntaxTree
           []
         end
 
-        alias deconstruct value
+        alias deconstruct child_nodes
 
         def deconstruct_keys(keys)
           { value: value }
