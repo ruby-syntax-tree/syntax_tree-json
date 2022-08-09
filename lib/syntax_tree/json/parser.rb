@@ -46,23 +46,22 @@ module SyntaxTree
         buffer.gsub!(/\A\s+/, "")
 
         until buffer.empty?
-          tokens <<
-            case buffer
-            in /\A[\{\}\[\],:]/
-              Token.new(type: $&.to_sym)
-            in %r{\A-?(0|[1-9]\d*)(\.\d+)?([Ee][-+]?\d+)?}
-              Token.new(type: :number, value: $&)
-            in %r{\A"[^"\\\t\n\x00]*(?:\\[bfnrtu\\/"][^"\\]*)*"}
-              Token.new(type: :string, value: $&)
-            in /\Atrue/
-              Token.new(type: :true)
-            in /\Afalse/
-              Token.new(type: :false)
-            in /\Anull/
-              Token.new(type: :null)
-            else
-              raise ParseError, "unexpected token: #{buffer[0]}"
-            end
+          tokens << case buffer
+          in /\A[\{\}\[\],:]/
+            Token.new(type: $&.to_sym)
+          in /\A-?(0|[1-9]\d*)(\.\d+)?([Ee][-+]?\d+)?/
+            Token.new(type: :number, value: $&)
+          in %r{\A"[^"\\\t\n\x00]*(?:\\[bfnrtu\\/"][^"\\]*)*"}
+            Token.new(type: :string, value: $&)
+          in /\Atrue/
+            Token.new(type: :true)
+          in /\Afalse/
+            Token.new(type: :false)
+          in /\Anull/
+            Token.new(type: :null)
+          else
+            raise ParseError, "unexpected token: #{buffer[0]}"
+          end
 
           buffer = $'.gsub(/\A\s+/, "")
         end
@@ -72,11 +71,11 @@ module SyntaxTree
 
       def parse_array(tokens)
         values = []
-      
+
         loop do
           value, tokens = parse_item(tokens)
           values << value
-      
+
           case tokens
           in [Token[type: :"]"], *rest]
             return AST::Array.new(values: values), rest
@@ -87,15 +86,15 @@ module SyntaxTree
           end
         end
       end
-      
+
       def parse_object(tokens)
         values = {}
-      
+
         loop do
           if tokens in [{ type: :string, value: key }, { type: :":" }, *tokens]
             value, tokens = parse_item(tokens)
             values[key] = value
-        
+
             case tokens
             in [{ type: :"}" }, *rest]
               return AST::Object.new(values: values), rest

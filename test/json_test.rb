@@ -58,29 +58,29 @@ module SyntaxTree
       assert_format("1\n")
     end
 
-    Dir["test/JSONTestSuite/test_parsing/y_*.json"].each do |filepath|
-      define_method(:"test_#{filepath}") do
-        parse(JSON.read(filepath))
-      end
+    pattern = "JSONTestSuite/test_parsing/y_*.json"
+    Dir[File.expand_path(pattern, __dir__)].each do |filepath|
+      define_method(:"test_#{filepath}") { parse(JSON.read(filepath)) }
     end
 
     KNOWN_N_FAILURES = %w[
-      test/JSONTestSuite/test_parsing/n_string_1_surrogate_then_escape_u.json
-      test/JSONTestSuite/test_parsing/n_string_1_surrogate_then_escape_u1.json
-      test/JSONTestSuite/test_parsing/n_string_1_surrogate_then_escape_u1x.json
-      test/JSONTestSuite/test_parsing/n_string_1_surrogate_then_escape.json
-      test/JSONTestSuite/test_parsing/n_string_incomplete_escaped_character.json
-      test/JSONTestSuite/test_parsing/n_string_incomplete_surrogate_escape_invalid.json
-      test/JSONTestSuite/test_parsing/n_string_incomplete_surrogate.json
-      test/JSONTestSuite/test_parsing/n_string_invalid_unicode_escape.json
-      test/JSONTestSuite/test_parsing/n_structure_100000_opening_arrays.json
-      test/JSONTestSuite/test_parsing/n_structure_open_array_object.json
-      test/JSONTestSuite/test_parsing/n_structure_whitespace_formfeed.json
+      n_string_1_surrogate_then_escape_u.json
+      n_string_1_surrogate_then_escape_u1.json
+      n_string_1_surrogate_then_escape_u1x.json
+      n_string_1_surrogate_then_escape.json
+      n_string_incomplete_escaped_character.json
+      n_string_incomplete_surrogate_escape_invalid.json
+      n_string_incomplete_surrogate.json
+      n_string_invalid_unicode_escape.json
+      n_structure_100000_opening_arrays.json
+      n_structure_open_array_object.json
+      n_structure_whitespace_formfeed.json
     ]
 
-    Dir["test/JSONTestSuite/test_parsing/n_*.json"].each do |filepath|
+    pattern = "JSONTestSuite/test_parsing/n_*.json"
+    Dir[File.expand_path(pattern, __dir__)].each do |filepath|
       define_method(:"test_#{filepath}") do
-        skip if KNOWN_N_FAILURES.include?(filepath)
+        skip if KNOWN_N_FAILURES.include?(File.basename(filepath))
 
         assert_raises(JSON::Parser::ParseError) do
           JSON.parse(JSON.read(filepath))

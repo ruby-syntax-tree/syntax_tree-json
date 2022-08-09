@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 ## [Unreleased]
 
+## [0.3.0] - 2022-08-09
+
+### Changed
+
+- Dropped `json` as a dependency, doing all parsing in-gem.
+
 ## [0.2.0] - 2022-05-13
 
 ### Changed

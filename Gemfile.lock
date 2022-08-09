@@ -1,8 +1,7 @@
 PATH
   remote: .
   specs:
-    syntax_tree-json (0.2.0)
-      json
+    syntax_tree-json (0.3.0)
       prettier_print
       syntax_tree (>= 2.0.1)
 
@@ -10,7 +9,6 @@ GEM
   remote: https://rubygems.org/
   specs:
     docile (1.4.0)
-    json (2.6.2)
     minitest (5.16.2)
     prettier_print (0.1.0)
     rake (13.0.6)
