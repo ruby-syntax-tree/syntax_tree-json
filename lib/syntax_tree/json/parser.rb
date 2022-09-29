@@ -16,7 +16,8 @@ module SyntaxTree
 
       def parse
         if parse_item(make_tokens) in [value, []]
-          AST::Root.new(value: value)
+          location = AST::Location.new(0, source.length)
+          AST::Root.new(value: value, location: location)
         else
           raise ParseError, "unexpected tokens after value"
         end
@@ -26,15 +27,16 @@ module SyntaxTree
 
       # This represents a parsed token from the source.
       class Token
-        attr_reader :type, :value
+        attr_reader :type, :location, :value
 
-        def initialize(type:, value: nil)
+        def initialize(type:, location:, value: nil)
           @type = type
+          @location = location
           @value = value
         end
 
         def deconstruct_keys(keys)
-          { type: type, value: value }
+          { type: type, location: location, value: value }
         end
       end
 
@@ -43,33 +45,44 @@ module SyntaxTree
         raise ParseError, "invalid UTF-8" unless buffer.valid_encoding?
 
         tokens = []
+        offset = 0
+
         buffer.gsub!(/\A\s+/, "")
+        offset += $&.length if $&
 
         until buffer.empty?
           tokens << case buffer
           in /\A[\{\}\[\],:]/
-            Token.new(type: $&.to_sym)
+            location = AST::Location.new(offset, offset + $&.length)
+            Token.new(type: $&.to_sym, location: location)
           in /\A-?(0|[1-9]\d*)(\.\d+)?([Ee][-+]?\d+)?/
-            Token.new(type: :number, value: $&)
+            location = AST::Location.new(offset, offset + $&.length)
+            Token.new(type: :number, location: location, value: $&)
           in %r{\A"[^"\\\t\n\x00]*(?:\\[bfnrtu\\/"][^"\\]*)*"}
-            Token.new(type: :string, value: $&)
+            location = AST::Location.new(offset, offset + $&.length)
+            Token.new(type: :string, location: location, value: $&)
           in /\Atrue/
-            Token.new(type: :true)
+            location = AST::Location.new(offset, offset + $&.length)
+            Token.new(type: :true, location: location)
           in /\Afalse/
-            Token.new(type: :false)
+            location = AST::Location.new(offset, offset + $&.length)
+            Token.new(type: :false, location: location)
           in /\Anull/
-            Token.new(type: :null)
+            location = AST::Location.new(offset, offset + $&.length)
+            Token.new(type: :null, location: location)
           else
             raise ParseError, "unexpected token: #{buffer[0]}"
           end
 
+          offset += $&.length
           buffer = $'.gsub(/\A\s+/, "")
+          offset += $&.length if $&
         end
 
         tokens
       end
 
-      def parse_array(tokens)
+      def parse_array(tokens, start_location)
         values = []
 
         loop do
@@ -77,8 +90,9 @@ module SyntaxTree
           values << value
 
           case tokens
-          in [Token[type: :"]"], *rest]
-            return AST::Array.new(values: values), rest
+          in [Token[type: :"]", location: end_location], *rest]
+            location = start_location.to(end_location)
+            return AST::Array.new(values: values, location: location), rest
           in [Token[type: :","], *rest]
             tokens = rest
           else
@@ -87,7 +101,7 @@ module SyntaxTree
         end
       end
 
-      def parse_object(tokens)
+      def parse_object(tokens, start_location)
         values = {}
 
         loop do
@@ -96,8 +110,9 @@ module SyntaxTree
             values[key] = value
 
             case tokens
-            in [{ type: :"}" }, *rest]
-              return AST::Object.new(values: values), rest
+            in [{ type: :"}", location: end_location }, *rest]
+              location = start_location.to(end_location)
+              return AST::Object.new(values: values, location: location), rest
             in [{ type: :"," }, *rest]
               tokens = rest
             else
@@ -111,24 +126,45 @@ module SyntaxTree
 
       def parse_item(tokens)
         case tokens
-        in [{ type: :"[" }, { type: :"]" }, *rest]
-          [AST::Array.new(values: []), rest]
-        in [{ type: :"[" }, *rest]
-          parse_array(rest)
-        in [{ type: :"{" }, { type: :"}" }, *rest]
-          [AST::Object.new(values: {}), rest]
-        in [{ type: :"{" }, *rest]
-          parse_object(rest)
-        in [{ type: :false }, *rest]
-          [AST::False.new, rest]
-        in [{ type: :true }, *rest]
-          [AST::True.new, rest]
-        in [{ type: :null }, *rest]
-          [AST::Null.new, rest]
-        in [{ type: :string, value: value }, *rest]
-          [AST::String.new(value: value), rest]
-        in [{ type: :number, value: }, *rest]
-          [AST::Number.new(value: value), rest]
+        in [
+             { type: :"[", location: start_location },
+             { type: :"]", location: end_location },
+             *rest
+           ]
+          [
+            AST::Array.new(
+              values: [],
+              location: start_location.to(end_location)
+            ),
+            rest
+          ]
+        in [{ type: :"[", location: start_location }, *rest]
+          parse_array(rest, start_location)
+        in [
+             { type: :"{", location: start_location },
+             { type: :"}", location: end_location },
+             *rest
+           ]
+          [
+            AST::Object.new(
+              values: {
+              },
+              location: start_location.to(end_location)
+            ),
+            rest
+          ]
+        in [{ type: :"{", location: start_location }, *rest]
+          parse_object(rest, start_location)
+        in [{ type: :false, location: }, *rest]
+          [AST::False.new(location: location), rest]
+        in [{ type: :true, location: }, *rest]
+          [AST::True.new(location: location), rest]
+        in [{ type: :null, location: }, *rest]
+          [AST::Null.new(location: location), rest]
+        in [{ type: :string, value:, location: }, *rest]
+          [AST::String.new(value: value, location:), rest]
+        in [{ type: :number, value:, location: }, *rest]
+          [AST::Number.new(value: value, location: location), rest]
         else
           raise ParseError, "unexpected token: #{tokens.first&.type}"
         end

@@ -3,6 +3,20 @@
 module SyntaxTree
   module JSON
     module AST
+      # This is the location of the AST node in the source string.
+      class Location
+        attr_reader :start_offset, :end_offset
+
+        def initialize(start_offset, end_offset)
+          @start_offset = start_offset
+          @end_offset = end_offset
+        end
+
+        def to(other)
+          Location.new(start_offset, other.end_offset)
+        end
+      end
+
       # This is the parent node of all of the nodes in the AST.
       class Node
         def format(q)
@@ -16,10 +30,11 @@ module SyntaxTree
 
       # This represents an array in the tree.
       class Array < Node
-        attr_reader :values
+        attr_reader :values, :location
 
-        def initialize(values:)
+        def initialize(values:, location:)
           @values = values
+          @location = location
         end
 
         def accept(visitor)
@@ -33,12 +48,18 @@ module SyntaxTree
         alias deconstruct child_nodes
 
         def deconstruct_keys(keys)
-          { values: values }
+          { values: values, location: location }
         end
       end
 
       # This represents a false in the tree.
       class False < Node
+        attr_reader :location
+
+        def initialize(location:)
+          @location = location
+        end
+
         def accept(visitor)
           visitor.visit_false(self)
         end
@@ -50,12 +71,18 @@ module SyntaxTree
         alias deconstruct child_nodes
 
         def deconstruct_keys(keys)
-          {}
+          { location: location }
         end
       end
 
       # This represents a null in the tree.
       class Null < Node
+        attr_reader :location
+
+        def initialize(location:)
+          @location = location
+        end
+
         def accept(visitor)
           visitor.visit_null(self)
         end
@@ -67,16 +94,17 @@ module SyntaxTree
         alias deconstruct child_nodes
 
         def deconstruct_keys(keys)
-          {}
+          { location: location }
         end
       end
 
       # This represents a number in the tree.
       class Number < Node
-        attr_reader :value
+        attr_reader :value, :location
 
-        def initialize(value:)
+        def initialize(value:, location:)
           @value = value
+          @location = location
         end
 
         def accept(visitor)
@@ -90,16 +118,17 @@ module SyntaxTree
         alias deconstruct child_nodes
 
         def deconstruct_keys(keys)
-          { value: value }
+          { value: value, location: location }
         end
       end
 
       # This represents an object in the tree.
       class Object < Node
-        attr_reader :values
+        attr_reader :values, :location
 
-        def initialize(values:)
+        def initialize(values:, location:)
           @values = values
+          @location = location
         end
 
         def accept(visitor)
@@ -113,16 +142,17 @@ module SyntaxTree
         alias deconstruct child_nodes
 
         def deconstruct_keys(keys)
-          { values: values }
+          { values: values, location: location }
         end
       end
 
       # This is the top of the JSON syntax tree.
       class Root < Node
-        attr_reader :value
+        attr_reader :value, :location
 
-        def initialize(value:)
+        def initialize(value:, location:)
           @value = value
+          @location = location
         end
 
         def accept(visitor)
@@ -136,16 +166,17 @@ module SyntaxTree
         alias deconstruct child_nodes
 
         def deconstruct_keys(keys)
-          { value: value }
+          { value: value, location: location }
         end
       end
 
       # This represents a string in the tree.
       class String < Node
-        attr_reader :value
+        attr_reader :value, :location
 
-        def initialize(value:)
+        def initialize(value:, location:)
           @value = value
+          @location = location
         end
 
         def accept(visitor)
@@ -159,12 +190,18 @@ module SyntaxTree
         alias deconstruct child_nodes
 
         def deconstruct_keys(keys)
-          { value: value }
+          { value: value, location: location }
         end
       end
 
       # This represents a true in the tree.
       class True < Node
+        attr_reader :location
+
+        def initialize(location:)
+          @location = location
+        end
+
         def accept(visitor)
           visitor.visit_true(self)
         end
@@ -176,7 +213,7 @@ module SyntaxTree
         alias deconstruct child_nodes
 
         def deconstruct_keys(keys)
-          {}
+          { location: location }
         end
       end
     end
