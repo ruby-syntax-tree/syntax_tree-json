@@ -156,9 +156,12 @@ module SyntaxTree
             in [:pack_object, length, location]
               values << AST::Object.new(values: values.pop(length * 2).each_slice(2).to_a, location: location)
             in [:pack_root, location]
-              return AST::Root.new(value: values.pop, location: location)
+              values << AST::Root.new(value: values.pop, location: location)
             end
           end
+
+          values => [AST::Root => value]
+          value
         end
       end
     end
