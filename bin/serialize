@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+
+require "bundler/setup"
+require "syntax_tree/json"
+
+filepath = File.expand_path("../test.json", __dir__)
+contents = SyntaxTree::JSON.read(filepath)
+
+File.write("#{filepath}.ser", SyntaxTree::JSON.dump(contents))
