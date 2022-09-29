@@ -60,7 +60,12 @@ module SyntaxTree
 
     pattern = "JSONTestSuite/test_parsing/y_*.json"
     Dir[File.expand_path(pattern, __dir__)].each do |filepath|
-      define_method(:"test_#{filepath}") { parse(JSON.read(filepath)) }
+      define_method(:"test_#{filepath}") do
+        source = JSON.read(filepath)
+
+        parsed = parse(source)
+        assert_equal parsed, JSON.load(source, JSON.dump(source))
+      end
     end
 
     KNOWN_N_FAILURES = %w[

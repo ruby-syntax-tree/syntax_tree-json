@@ -47,9 +47,9 @@ module SyntaxTree
 
           q.indent do
             q.breakable
-            q.seplist(node.values, nil, :each_pair) do |key, value|
+            q.seplist(node.values) do |(key, value)|
               q.group do
-                q.text(key)
+                visit(key)
                 q.text(": ")
                 visit(value)
               end
