@@ -11,7 +11,9 @@ Rake::TestTask.new(:test) do |t|
 end
 
 SOURCE_FILES =
-  FileList[%w[Gemfile Rakefile syntax_tree-json.gemspec lib/**/*.rb test/*.rb]]
+  FileList[
+    %w[Gemfile Rakefile syntax_tree-json.gemspec lib/**/*.rb test/*.rb]
+  ] - ["lib/syntax_tree/json/serialization.rb"]
 
 SyntaxTree::Rake::CheckTask.new { |t| t.source_files = SOURCE_FILES }
 SyntaxTree::Rake::WriteTask.new { |t| t.source_files = SOURCE_FILES }

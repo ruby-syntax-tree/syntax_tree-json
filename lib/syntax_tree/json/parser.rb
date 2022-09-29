@@ -102,12 +102,16 @@ module SyntaxTree
       end
 
       def parse_object(tokens, start_location)
-        values = {}
+        values = []
 
         loop do
-          if tokens in [{ type: :string, value: key }, { type: :":" }, *tokens]
+          # stree-ignore
+          if tokens in [{ type: :string, value: key_value, location: key_location }, { type: :":" }, *tokens]
             value, tokens = parse_item(tokens)
-            values[key] = value
+            values << [
+              AST::String.new(value: key_value, location: key_location),
+              value
+            ]
 
             case tokens
             in [{ type: :"}", location: end_location }, *rest]
@@ -125,12 +129,9 @@ module SyntaxTree
       end
 
       def parse_item(tokens)
+        # stree-ignore
         case tokens
-        in [
-             { type: :"[", location: start_location },
-             { type: :"]", location: end_location },
-             *rest
-           ]
+        in [{ type: :"[", location: start_location }, { type: :"]", location: end_location }, *rest]
           [
             AST::Array.new(
               values: [],
@@ -140,15 +141,10 @@ module SyntaxTree
           ]
         in [{ type: :"[", location: start_location }, *rest]
           parse_array(rest, start_location)
-        in [
-             { type: :"{", location: start_location },
-             { type: :"}", location: end_location },
-             *rest
-           ]
+        in [{ type: :"{", location: start_location }, { type: :"}", location: end_location }, *rest]
           [
             AST::Object.new(
-              values: {
-              },
+              values: [],
               location: start_location.to(end_location)
             ),
             rest

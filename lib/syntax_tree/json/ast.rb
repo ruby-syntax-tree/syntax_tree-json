@@ -12,8 +12,22 @@ module SyntaxTree
           @end_offset = end_offset
         end
 
+        def deconstruct_keys(keys)
+          { start_offset: start_offset, end_offset: end_offset }
+        end
+
         def to(other)
           Location.new(start_offset, other.end_offset)
+        end
+
+        def to_range
+          start_offset...end_offset
+        end
+
+        def ==(other)
+          other in Location[
+            start_offset: ^(start_offset), end_offset: ^(end_offset)
+          ]
         end
       end
 
@@ -50,6 +64,10 @@ module SyntaxTree
         def deconstruct_keys(keys)
           { values: values, location: location }
         end
+
+        def ==(other)
+          other in Array[values: ^(values), location: ^(location)]
+        end
       end
 
       # This represents a false in the tree.
@@ -73,6 +91,10 @@ module SyntaxTree
         def deconstruct_keys(keys)
           { location: location }
         end
+
+        def ==(other)
+          other in False[location: ^(location)]
+        end
       end
 
       # This represents a null in the tree.
@@ -95,6 +117,10 @@ module SyntaxTree
 
         def deconstruct_keys(keys)
           { location: location }
+        end
+
+        def ==(other)
+          other in Null[location: ^(location)]
         end
       end
 
@@ -120,6 +146,10 @@ module SyntaxTree
         def deconstruct_keys(keys)
           { value: value, location: location }
         end
+
+        def ==(other)
+          other in Number[value: ^(value), location: ^(location)]
+        end
       end
 
       # This represents an object in the tree.
@@ -136,13 +166,17 @@ module SyntaxTree
         end
 
         def child_nodes
-          values.values
+          values.map(&:last)
         end
 
         alias deconstruct child_nodes
 
         def deconstruct_keys(keys)
           { values: values, location: location }
+        end
+
+        def ==(other)
+          other in Object[values: ^(values), location: ^(location)]
         end
       end
 
@@ -168,6 +202,10 @@ module SyntaxTree
         def deconstruct_keys(keys)
           { value: value, location: location }
         end
+
+        def ==(other)
+          other in Root[value: ^(value), location: ^(location)]
+        end
       end
 
       # This represents a string in the tree.
@@ -192,6 +230,10 @@ module SyntaxTree
         def deconstruct_keys(keys)
           { value: value, location: location }
         end
+
+        def ==(other)
+          other in String[value: ^(value), location: ^(location)]
+        end
       end
 
       # This represents a true in the tree.
@@ -214,6 +256,10 @@ module SyntaxTree
 
         def deconstruct_keys(keys)
           { location: location }
+        end
+
+        def ==(other)
+          other in True[location: ^(location)]
         end
       end
     end
